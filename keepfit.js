@@ -37,9 +37,9 @@
             fitHeightScale(target);
             window.onresize = fitHeightScale;
         }
-        else if (fit.toLowerCase() == 'all') {
-            fitAllScale(target);
-            window.onresize = fitAllScale;
+        else if (fit.toLowerCase() == 'both') {
+            fitBothScale(target);
+            window.onresize = fitBothScale;
         }
     }
 
@@ -55,11 +55,11 @@
         setScale(target, ratio);
     }
 
-    function fitAllScale(e) {
+    function fitBothScale(e) {
         let winSize = [window.innerWidth, window.innerHeight];
         let ratioW = winSize[0]/designSize[0];
         let ratioH = winSize[1]/designSize[1];
-        setAllScale(target, ratioW, ratioH);
+        setBothScale(target, ratioW, ratioH);
     }
 
     function setScale(el, ratio) {
@@ -88,8 +88,7 @@
         }
     }
 
-    function setAllScale(el, ratioW, ratioH) {
-        el.parentNode.style.overflow = 'hidden';
+    function setBothScale(el, ratioW, ratioH) {
         el.style.transformOrigin = 'top left';
         el.style.position = 'absolute';
         el.style.top = '0';
