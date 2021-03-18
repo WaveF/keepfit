@@ -1,4 +1,6 @@
-# KeepFit - 可视化大屏自动缩放
+# KeepFit
+
+Keep specified DOM element fit the browser size.
 
 ## Install
 ```html
@@ -9,10 +11,13 @@
 ```javascript
 keepfit(target, options)
 ```
-| Param  | Type   | Default         | Description |
-| ------ | ------ | --------------- | ----------- |
-| target | object | `document.body` | ... |
-| options.fit | string | `width` | ... |
+| Param           | Type   | Value(s)                        | Description           |
+|-----------------|--------|---------------------------------|-----------------------|
+| `target`        | object | `document.body`                 | DOM element           |
+| `options`       | object | `{ fit, size, align }`          | parameters            |
+| `options.fit`   | string | `'width'`, `'height'`, `'both'` | scale mode for target |
+| `options.size`  | array  | `[1920, 1080]`                  | size of your design   |
+| `options.align` | string | `'center'`, `'top center'`      | transform Origin      |
 
 
 ## Example
@@ -23,4 +28,3 @@ keepfit(document.querySelector('#app'), {
     align: 'center'
 });
 ```
-
