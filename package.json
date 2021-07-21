@@ -1,0 +1,24 @@
+{
+  "name": "keepfit",
+  "version": "1.0.3",
+  "description": "Keep specified DOM element fit the browser size",
+  "main": "keepfit.js",
+  "scripts": {
+    "publish": "npm publish",
+    "patch": "npm version patch",
+    "minor": "npm version minor",
+    "major": "npm version major"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/wavef/keepfit.git"
+  },
+  "keywords": [
+    "responsive",
+    "scale",
+    "resize",
+    "dom"
+  ],
+  "author": "wavef",
+  "license": "ISC"
+}
