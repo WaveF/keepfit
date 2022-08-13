@@ -1,147 +1,127 @@
 (function (root, factory) {
-    let moduleName = 'keepfit';
-    if (typeof define === "function") { /* AMD */
-        define(moduleName, factory);
-    } else if (typeof module === "object" && typeof exports === "object") { /* CommonJS */
-        module.exports = factory();
-    } else if (typeof exports === "object") { /* CommonJS2 */
-        exports[moduleName] = factory();
-    } else { /* ES5 */
-        root[moduleName] = factory();
-    }
+  let moduleName = 'keepfit';
+  if (typeof define === "function") { /* AMD */
+    define(moduleName, factory);
+  } else if (typeof module === "object" && typeof exports === "object") { /* CommonJS */
+    module.exports = factory();
+  } else if (typeof exports === "object") { /* CommonJS2 */
+    exports[moduleName] = factory();
+  } else { /* ES5 */
+    root[moduleName] = factory();
+  }
 })(this, function () {
-    let target, fitMode, designSize, alignment;
-    
-    return function main(el, params) {
-        target = el || document.body;
-        let fit = params.fit || 'width';
-        let size = params.size || [1920, 1080];
-        let align = params.align || 'top left';
-        fitMode = fit;
-        alignment = align;
+  let container, options, mode, designSize, designDir, px2rem;
 
-        let viewport = document.getElementsByTagName('meta')['viewport'];
-        if (viewport) { viewport.parentElement.removeChild(viewport); }
-        viewport = appendViewPortMeta(size);
-        
-        let config = formatMetaContent(viewport.content);
-        let designWidth = config.width;
-        let designHeight = config.height;
-        designSize = [designWidth, designHeight];
+  function keepfit(target, opts) {
+    container = target;
+    options = opts;
+    mode = options.mode || 'scale';
+    designSize = { w: options.size[0] || 1920, h: options.size[1] || 1080 };
+    designDir = designSize.w >= designSize.h ? 'landscape' : 'portrait';
+    px2rem = options.px2rem === undefined ? 100 : options.px2rem;
 
-        target.style.width = designWidth;
-        target.style.height = designHeight;
+    let viewport = document.getElementsByTagName('meta')['viewport'];
+    viewport.content = 'width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no';
 
-        if (fit.toLowerCase() == 'width') {
-            fitWidthScale(target);
-            window.onresize = fitWidthScale;
-        }
-        else if (fit.toLowerCase() == 'height') {
-            fitHeightScale(target);
-            window.onresize = fitHeightScale;
-        }
-        else if (fit.toLowerCase() == 'both') {
-            fitBothScale(target);
-            window.onresize = fitBothScale;
-        }
+    onResizeHandler();
+    window.addEventListener('resize', onResizeHandler);
+
+  };
+
+  function onResizeHandler(e) {
+
+    if (mode.toLowerCase() == 'scale') {
+      useScaleMode(window.innerWidth, window.innerHeight);
+    }
+    else if (mode.toLowerCase() == 'rem') {
+      useRemMode(px2rem);
     }
 
-    function fitWidthScale(e) {
-        let winSize = [window.innerWidth, window.innerHeight];
-        let ratio = winSize[0]/designSize[0];
-        setScale(target, ratio);
+  }
+
+  function useScaleMode(w,h) {
+    let fit = options.fit.toLowerCase() || 'width';
+    let align = options.align.toLowerCase() || 'center';
+    let lock = options.lock;
+    lock === undefined ? true : lock;
+
+    let ratioX = 1, ratioY = 1;
+    let newTop = 0, newLeft = 0;
+    let newTransform, rotate = 0;
+
+    let screenSize = { w, h };
+    let screenDir = w >= h ? 'landscape' : 'portrait';
+    let matchDir = screenDir == designDir;
+
+    if (matchDir || !lock) {
+      rotate = 0;
+
+      if (fit === 'width') {
+        ratioX = ratioY = screenSize.w / designSize.w;
+        newTop = (screenSize.h - designSize.h * ratioX) / 2;
+      }
+      else if (fit === 'height') {
+        ratioX = ratioY = screenSize.h / designSize.h;
+        newLeft = (screenSize.w - designSize.w * ratioY) / 2;
+      }
+      else if (fit === 'both') {
+        ratioX = screenSize.w / designSize.w;
+        ratioY = screenSize.h / designSize.h;
+        newTop = newLeft = 0;
+      }
+
+      // 默认计算的坐标是xy居中，这里对特定位置进行锁死
+      newTop  = align.includes('top')  ? 0 : newTop;
+      newLeft = align.includes('left') ? 0 : newLeft;
+
+    }
+    else if (!matchDir || lock) {
+      rotate = 90;
+      
+      if (fit === 'width') {
+        ratioX = ratioY = screenSize.h / designSize.w;
+        newTop = (screenSize.h - designSize.w * ratioX) / 2;
+        newLeft = (screenSize.w + designSize.h * ratioX) / 2;
+      }
+      else if (fit === 'height') {
+        ratioX = ratioY = screenSize.w / designSize.h;
+        newTop = (screenSize.h - designSize.w * ratioY) / 2;
+        newLeft = screenSize.w;
+      }
+      else if (fit === 'both') {
+        ratioX = screenSize.w / designSize.h;
+        ratioY = screenSize.h / designSize.w;
+        newLeft = screenSize.w;
+      }
+
+      newTop  = align.includes('left') ? 0 : newTop;
+      newLeft = align.includes('top') ? screenSize.w : newLeft;
+      
     }
 
-    function fitHeightScale(e) {
-        let winSize = [window.innerWidth, window.innerHeight];
-        let ratio = winSize[1]/designSize[1];
-        setScale(target, ratio);
-    }
+    newTransform = `scale(${ratioX}, ${ratioY}) rotate(${rotate}deg)`;
 
-    function fitBothScale(e) {
-        let winSize = [window.innerWidth, window.innerHeight];
-        let ratioW = winSize[0]/designSize[0];
-        let ratioH = winSize[1]/designSize[1];
-        setBothScale(target, ratioW, ratioH);
-    }
+    container.setAttribute('style', `
+      position: absolute;
+      width: ${designSize.w}px;
+      height: ${designSize.h}px;
+      top: ${newTop}px;
+      left: ${newLeft}px;
+      transform-origin: 0px 0px;
+      transform: ${newTransform}
+    `);
+  }
 
-    function setScale(el, ratio) {
-        el.style.transformOrigin = alignment;
+  function useRemMode(base) {
+    const htmlStyle = document.documentElement.style;
+    const designWidth = designSize.w;
+    const designHeight = designSize.h;
+    const designRatio = designWidth / designHeight;
+    const { innerWidth: width, innerHeight: height } = window;
+    const ratio = width / height;
 
-        if (alignment == 'center') {
-            el.style.position = 'absolute';
-            el.style.top = '50%';
-            el.style.left = '50%';
-            el.style.transform = `translate(-50%, -50%) scale(${ratio})`;
-        }
-        else if (alignment.indexOf('top')!=-1 && alignment.indexOf('center')!=-1) {
-            el.style.position = 'absolute';
-            el.style.top = '0';
-            el.style.left = '50%';
-            el.style.transform = `translateX(-50%) scale(${ratio})`;
-        }
-        else if (alignment.indexOf('top')!=-1 && alignment.indexOf('left')!=-1) {
-            el.style.position = 'absolute';
-            el.style.top = '0';
-            el.style.left = '0';
-            el.style.transform = `scale(${ratio})`;
-        }
-        else {
-            el.style.transform = `scale(${ratio})`;
-        }
-    }
+    htmlStyle.fontSize = (ratio > designRatio ? height / designHeight : width / designWidth) * base + 'px';
+  }
 
-    function setBothScale(el, ratioW, ratioH) {
-        el.style.transformOrigin = 'top left';
-        el.style.position = 'absolute';
-        el.style.top = '0';
-        el.style.left = '0';
-        el.style.transform = `scale(${ratioW}, ${ratioH})`;
-    }
-
-    function getTransform(el) {
-        let st = window.getComputedStyle(el, null);
-        let tr = st.getPropertyValue("-webkit-transform") ||
-            st.getPropertyValue("-moz-transform") ||
-            st.getPropertyValue("-ms-transform") ||
-            st.getPropertyValue("-o-transform") ||
-            st.getPropertyValue("transform") ||
-            "FAIL";
-        let values = tr.split('(')[1].split(')')[0].split(',');
-        let a = values[0];
-        let b = values[1];
-        let c = values[2];
-        let d = values[3];
-        let scale = Math.sqrt(a * a + b * b);
-        let sin = b / scale;
-        let angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
-        return {
-            scale: scale,
-            rotate: angle
-        };
-    }
-
-    function appendViewPortMeta(size) {
-        size = size || [1920, 1080];
-        let meta = document.createElement('meta');
-        meta.content = `width=${size[0]},height=${size[1]},initial-scale=1.0,maximum-scale=1,user-scalable=no`;
-        document.head.appendChild(meta);
-        return meta;
-    }
-
-    function formatMetaContent(str) {
-        let res = {};
-        let arr = str.split(',');
-        for (let i=0; i<arr.length; i++) {
-            let kv = arr[i].split('=');
-            let key = kv[0];
-            let val = kv[1];
-            if (!isNaN(Number(val))) {
-                val = Number(val);
-            }
-            res[key] = val;
-        }
-        return res;
-    }
-    
+  return keepfit;
 });

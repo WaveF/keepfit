@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rem Mode</title>
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <h1>DATA VISUALIZATION</h1>
+    </div>
+    <ul class="panels">
+      <li class="panel"></li>
+      <li class="panel"></li>
+      <li class="panel"></li>
+      <li class="panel"></li>
+      <li class="panel"></li>
+      <li class="panel"></li>
+    </ul>
+    <div class="footer"></div>
+  </div>
+  
+  <script src="/keepfit.js"></script>
+  <script>
+    keepfit(document.querySelector('#app'), {
+      size: [1920, 1080],
+      mode: 'rem'
+    });
+  </script>
+</body>
+</html>
