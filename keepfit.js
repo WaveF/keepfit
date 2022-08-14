@@ -21,7 +21,14 @@
     px2rem = options.px2rem === undefined ? 100 : options.px2rem;
 
     let viewport = document.getElementsByTagName('meta')['viewport'];
-    viewport.content = 'width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no';
+    let viewportContent = 'width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no';
+    if (viewport) {
+      viewport.content = viewportContent;
+    } else {
+      viewport = document.createElement('meta');
+      viewport.setAttribute('viewport', viewportContent);
+      document.getElementsByTagName('head')[0].appendChild(viewport);
+    }
 
     onResizeHandler();
     window.addEventListener('resize', onResizeHandler);

@@ -1,6 +1,6 @@
 {
   "name": "keepfit",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Keep specified DOM element fit the browser size",
   "main": "keepfit.js",
   "scripts": {
