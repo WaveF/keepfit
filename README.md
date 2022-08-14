@@ -37,11 +37,12 @@ keepfit(target, options);
 
 
 #### Scale Mode
-| 参数            | 类型   | 值                              | 描述                     |
-|-----------------|--------|---------------------------------|-------------------------|
-| `options.fit`   | string | `'width'`, `'height'`, `'both'` | scale: 缩放基准         |
-| `options.align` | string | `'center'`, `'top center'`      | scale: 缩放中心点       |
-| `options.lock`  | string | `true`, `false`                 | 锁定屏幕方向 (v3)       |
+| 参数              | 类型   | 值                              | 描述                    |
+|------------------|--------|---------------------------------|-------------------------|
+| `options.fit`    | string | `'width'`, `'height'`, `'both'` | scale: 缩放基准          |
+| `options.align`  | string | `'center'`, `'top center'`      | scale: 缩放中心点        |
+| `options.lock`   | string | `true`, `false`                 | 锁定屏幕方向 (v3)        |
+| `options.px2rem` | string | `100`                           | 兼容基于rem模式的缩放    |
 
 #### Rem Mode
 | 参数              | 类型   | 值       | 描述                                |

@@ -1,6 +1,6 @@
 (function (root, factory) {
   let moduleName = 'keepfit';
-  if (typeof define === "function") { /* AMD */
+  if (typeof define === "function" && define.amd) { /* AMD */
     define(moduleName, factory);
   } else if (typeof module === "object" && typeof exports === "object") { /* CommonJS */
     module.exports = factory();
@@ -44,6 +44,10 @@
     let align = options.align.toLowerCase() || 'center';
     let lock = options.lock;
     lock === undefined ? true : lock;
+
+    if (px2rem !== undefined) {
+      document.documentElement.style.fontSize = `${px2rem}px`;
+    }
 
     let ratioX = 1, ratioY = 1;
     let newTop = 0, newLeft = 0;
