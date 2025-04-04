@@ -35,13 +35,14 @@
     </table>
   </div>
 
-  <script src="/keepfit.js"></script>
+  <script src="/keepfit.min.js"></script>
   <script>
     keepfit(document.querySelector('#app'), {
       size: [1920, 1080],
       mode: 'scale',
-      fit: 'width',
-      align: 'center top'
+      fit: 'both',
+      align: 'center top',
+      lock: true
     });
   </script>
 </body>
